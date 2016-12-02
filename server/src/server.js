@@ -16,29 +16,17 @@ console.log('Example app listening on port 3000!');
 // '..' means "go up one directory", so this translates into `client/build`!
 app.use(express.static('../client/build'));
 
-/**
- * Emulates a REST call to get the feed data for a particular user.
- */
-function getFeedData(user, cb) {
-  var userData = readDocument('users', user);
-  var feedData = readDocument('feeds', userData.feed);
-  // While map takes a callback, it is synchronous, not asynchronous.
-  // It calls the callback immediately.
-  feedData.contents = feedData.contents.map(getFeedItemSync);
-  // Return FeedData with resolved references.
-  return feedData;
-}
 
 /**
  * Resolves a feed item. Internal to the server, since it's synchronous.
- */
+*/
 function getFeedItemSync(feedItemId) {
-  var feedItem = readDocument('feedItems', feedItemId);
-  // Resolve 'like' counter.
-  feedItem.likeCounter = feedItem.likeCounter.map((id) => readDocument('users', id));
-  // Assuming a StatusUpdate. If we had other types of FeedItems in the DB, we would
-  // need to check the type and have logic for each type.
-  feedItem.contents.author = readDocument('users', feedItem.contents.author);
+var feedItem = readDocument('feedItems', feedItemId); // Resolve 'like' counter.
+feedItem.likeCounter = feedItem.likeCounter.map((id) =>
+readDocument('users', id)); // Assuming a StatusUpdate. If we had other types of
+// FeedItems in the DB, we would
+// need to check the type and have logic for each type.
+feedItem.contents.author = readDocument('users', feedItem.contents.author);
   // Resolve comment author.
   feedItem.comments.forEach((comment) => {
     comment.author = readDocument('users', comment.author);
@@ -46,13 +34,26 @@ function getFeedItemSync(feedItemId) {
   return feedItem;
 }
 
+
+/**
+ * Get the feed data for a particular user.
+*/
+function getFeedData(user) {
+var userData = readDocument('users', user);
+var feedData = readDocument('feeds', userData.feed);
+// While map takes a callback, it is synchronous,
+// not asynchronous. It calls the callback immediately. feedData.contents = feedData.contents.map(getFeedItemSync); // Return FeedData with resolved references.
+return feedData;
+}
+
+
 /**
  * Get the user ID from a token. Returns -1 (an invalid ID)
  * if it fails.
  */
 function getUserIdFromToken(authorizationLine) { try {
     // Cut off "Bearer " from the header value.
-var token = authorizationLine.slice(7);
+    var token = authorizationLine.slice(7);
 // Convert the base64 string to a UTF-8 string.
 var regularString = new Buffer(token, 'base64').toString('utf8'); // Convert the UTF-8 string into a JavaScript object.
 var tokenObj = JSON.parse(regularString);

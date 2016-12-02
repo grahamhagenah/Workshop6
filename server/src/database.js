@@ -103,7 +103,7 @@ var initialData = {
     }
   }
 };
-//Noticed change to database, read
+//Noticed change to database file
 
 var data;
 // If 'true', the in-memory object representing the database has changed,
