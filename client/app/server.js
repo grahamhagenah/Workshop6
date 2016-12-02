@@ -36,9 +36,9 @@ export function getFeedData(user, cb) {
   xhr.open('GET', '/user/4/feed');
   xhr.setRequestHeader('Authorization', 'Bearer jsontokenhere');
   xhr.addEventListener('load', function() {
-    // Call the callback with the data.
+  // Call the callback with the data.
     cb(JSON.parse(xhr.responseText));
-  });
+    });
   xhr.send();
 }
 
